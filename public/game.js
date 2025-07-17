@@ -70,10 +70,17 @@ document.addEventListener("DOMContentLoaded", () => {
       opponentScoreBaseballDisplay.textContent = '∞';
       
       // 멀티플레이용 UI 숨기기
-      document.getElementById('opponent-guesses-baseball').parentElement.style.display = 'none';
-      document.getElementById('my-secret-display').parentElement.style.display = 'none';
+      const opponentPanel = document.getElementById('opponent-panel');
+      if (opponentPanel) {
+        opponentPanel.style.display = 'none';
+      }
       
       // 채팅창을 시스템 로그로 사용
+      const chatPanel = document.getElementById('baseball-chat-box').closest('.baseball-panel');
+      if(chatPanel) {
+          const chatTitle = chatPanel.querySelector('h2');
+          if (chatTitle) chatTitle.textContent = '시스템 로그';
+      }
       baseballChatInput.disabled = true;
       baseballChatSend.disabled = true;
       baseballChatInput.placeholder = "시스템 메시지 로그";
@@ -87,11 +94,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function addRemainingAttemptsDisplay() {
       const scoreInfo = document.getElementById("score-info");
       if (scoreInfo) {
-          const remainingAttemptsSpan = document.createElement('span');
-          remainingAttemptsSpan.id = 'remaining-attempts';
-          remainingAttemptsSpan.className = 'remaining-attempts';
+          let remainingAttemptsSpan = document.getElementById('remaining-attempts');
+          if (!remainingAttemptsSpan) {
+              remainingAttemptsSpan = document.createElement('span');
+              remainingAttemptsSpan.id = 'remaining-attempts';
+              remainingAttemptsSpan.className = 'remaining-attempts';
+              scoreInfo.parentElement.appendChild(remainingAttemptsSpan);
+          }
           remainingAttemptsSpan.innerHTML = `남은 시도: <span id="remaining-count">${remainingTurns}</span> / ${maxTurns}`;
-          scoreInfo.parentElement.appendChild(remainingAttemptsSpan);
           scoreInfo.style.display = 'none'; // 기존 점수 표시는 숨김
       }
     }
@@ -148,7 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // 포기 버튼 클릭 시 모달 표시
       baseballSurrenderButton.addEventListener("click", () => {
-        surrenderConfirmModal.classList.add("show");
+        if (!gameEnded) {
+            surrenderConfirmModal.classList.add("show");
+        }
       });
 
       // 항복 확인 모달 "예" 버튼
@@ -242,9 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const answerContainer = baseballAnswerDisplay.parentElement;
       if (!isWin) {
           baseballAnswerDisplay.textContent = computerSecretNumber;
-          answerContainer.style.display = '';
+          if(answerContainer) answerContainer.style.display = '';
       } else {
-          answerContainer.style.display = 'none';
+          if(answerContainer) answerContainer.style.display = 'none';
       }
       
       baseballGameOverModal.classList.add("show");
@@ -256,12 +268,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeSinglePlayerUI();
     return;
   }
-
-  // ===================================================================
-  // =================== 다른 게임 로직 (오목 등) ==================
-  // ===================================================================
-  // 이 부분은 숫자야구 외 다른 게임을 위해 유지됩니다.
-  const setupScreen = document.getElementById("setup-screen");
-  if(setupScreen) setupScreen.classList.remove("hidden");
-  // ... (이하 다른 게임을 위한 기존 코드)
 });
