@@ -30,41 +30,41 @@
 
         <!-- 게임 플레이 화면 -->
         <div id="game-screen" class="game-screen hidden">
-            <div id="board-area" class="board-area">
-                <!-- 돌을 놓을 위치를 표시하는 마커 -->
-                <div id="preview-marker"></div>
-                <!-- 실제 돌들이 추가될 컨테이너 -->
-                <div id="stone-container"></div>
+            <!-- 게임 보드와 정보 패널을 포함하는 메인 영역 -->
+            <div class="game-main-content">
+                <div id="board-area" class="board-area">
+                    <div id="preview-marker"></div>
+                    <div id="stone-container"></div>
+                </div>
+                <!-- 플레이어 정보, 타이머, 채팅 메시지를 포함하는 스크롤 가능 영역 -->
+                <div class="info-panel">
+                    <div class="player-info">
+                        <h3>플레이어</h3>
+                        <div id="player1-card" class="player-card">
+                            <span class="player-name"><span class="player-stone black"></span><span id="player1-name">플레이어 1</span></span>
+                            <span id="player1-score">0</span>
+                        </div>
+                        <div id="player2-card" class="player-card">
+                            <span class="player-name"><span class="player-stone white"></span><span id="player2-name">플레이어 2</span></span>
+                            <span id="player2-score">0</span>
+                        </div>
+                    </div>
+                    <div class="timer-info">
+                        <h3>남은 시간</h3>
+                        <div id="timer">30</div>
+                    </div>
+                    <div class="chat-panel">
+                        <h3>채팅</h3>
+                        <div id="chat-messages"></div>
+                    </div>
+                </div>
             </div>
-            <div class="side-panel">
-                <div class="player-info">
-                    <h3>플레이어</h3>
-                    <div id="player1-card" class="player-card">
-                        <span class="player-name"><span class="player-stone black"></span><span id="player1-name">플레이어 1</span></span>
-                        <span id="player1-score">0</span>
-                    </div>
-                    <div id="player2-card" class="player-card">
-                        <span class="player-name"><span class="player-stone white"></span><span id="player2-name">플레이어 2</span></span>
-                        <span id="player2-score">0</span>
-                    </div>
-                </div>
-                <div class="timer-info">
-                    <h3>남은 시간</h3>
-                    <div id="timer">30</div>
-                </div>
-                <div class="actions">
-                    <h3>액션</h3>
-                    <button id="confirm-move-btn" class="btn" disabled>여기에 착수</button>
-                    <button id="surrender-btn" class="btn btn-danger">게임 포기</button>
-                </div>
-                <div class="chat-panel">
-                    <h3>채팅</h3>
-                    <div id="chat-messages"></div>
-                    <div id="chat-input">
-                        <input type="text" id="chat-input-field" placeholder="메시지 입력...">
-                        <button id="chat-send-btn" class="btn">전송</button>
-                    </div>
-                </div>
+            <!-- 화면 하단에 고정되는 액션 바 -->
+            <div id="ingame-actions" class="ingame-actions">
+                <input type="text" id="chat-input-field" placeholder="메시지 입력...">
+                <button id="chat-send-btn" class="btn">전송</button>
+                <button id="confirm-move-btn" class="btn" disabled>착수</button>
+                <button id="surrender-btn" class="btn btn-danger">포기</button>
             </div>
         </div>
     </div>
@@ -77,6 +77,18 @@
             <div class="modal-actions">
                 <button id="play-again-btn" class="btn">다시하기</button>
                 <a href="/" class="btn">홈으로</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 항복 확인 모달 -->
+    <div id="surrender-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1rem;">게임 포기</h2>
+            <p>정말로 게임을 포기하시겠습니까?</p>
+            <div class="modal-actions">
+                <button id="confirm-surrender-btn" class="btn btn-danger">예, 포기합니다</button>
+                <button id="cancel-surrender-btn" class="btn">아니오</button>
             </div>
         </div>
     </div>

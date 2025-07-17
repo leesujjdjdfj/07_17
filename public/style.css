@@ -4,10 +4,13 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
   color: #333;
   transition: background-color 0.5s ease;
 }
@@ -18,6 +21,10 @@ body.win-effect {
 
 body.lose-effect {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+body.game-active {
+    overflow: hidden; /* 게임 활성화 시 body 스크롤 방지 */
 }
 
 .hidden {
@@ -1090,381 +1097,6 @@ body.lose-effect {
   }
 }
 
-/* ===== 숫자야구 UI 스타일 (개선됨) ===== */
-.baseball-ui {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  height: auto;
-  padding: 0;
-  color: #fff;
-}
-
-.baseball-header {
-  padding: 1.2rem;
-  text-align: center;
-  background: #111;
-  border-bottom: 1px solid #444;
-  border-radius: 12px 12px 0 0;
-}
-
-.baseball-header h1 {
-  font-size: 1.8rem;
-  margin: 0 0 0.5rem 0;
-  color: #f0f0f0;
-}
-
-.game-info {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 1rem;
-  color: #bbb;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.baseball-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  background: #1e1e1e;
-  border-radius: 0 0 12px 12px;
-}
-
-.baseball-content {
-  flex: 1;
-  display: flex;
-  gap: 1.5rem;
-  overflow: hidden;
-}
-
-.baseball-panel {
-  background: #2a2a2a;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.baseball-panel h2 {
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #555;
-  padding-bottom: 0.75rem;
-  color: #fff;
-}
-
-.stats-section {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background: #333;
-  border-radius: 8px;
-}
-
-.secret-number-info {
-  font-size: 1rem;
-  color: #ddd;
-  text-align: center;
-}
-
-.guess-record, .chat-box {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 300px;
-  padding-right: 0.5rem;
-}
-
-.guess-card {
-  background: #333;
-  border-radius: 10px;
-  padding: 0.8rem 1rem;
-  border-left: 5px solid;
-  transition: background 0.4s, box-shadow 0.4s;
-  margin-bottom: 0.5rem;
-}
-
-.guess-card.success {
-  background: #1fa82c;
-  box-shadow: 0 0 12px #2fff5c;
-  color: #fff;
-  font-weight: bold;
-}
-
-.guess-card.mine {
-  border-color: #1e90ff;
-}
-
-.guess-card.theirs {
-  border-color: #ff5252;
-}
-
-.guess-card .round {
-  font-weight: bold;
-  margin-bottom: 0.2rem;
-  color: #fff;
-  font-size: 0.9rem;
-}
-
-.guess-card .details {
-  font-size: 1.1rem;
-  color: #ccc;
-}
-
-.chat-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.chat-msg {
-  padding: 0.7rem 1rem;
-  border-radius: 18px;
-  max-width: 80%;
-  line-height: 1.5;
-  word-wrap: break-word;
-  font-size: 1rem;
-}
-
-.mine-chat {
-  background: #007bff;
-  align-self: flex-end;
-  color: #fff;
-}
-
-.their-chat {
-  background: #444;
-  align-self: flex-start;
-  color: #fff;
-}
-
-.system-chat {
-  align-self: center;
-  background: #666;
-  font-size: 0.9rem;
-  color: #fff;
-  font-style: italic;
-}
-
-.chat-input {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 0.8rem;
-  border-radius: 10px;
-  border: none;
-  background: #444;
-  color: #fff;
-  font-size: 1rem;
-}
-
-.chat-input input::placeholder {
-  color: #aaa;
-}
-
-.chat-input button {
-  padding: 0.8rem 1.2rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #fff;
-  background: #007bff;
-  transition: background 0.3s;
-  font-size: 1rem;
-}
-
-.chat-input button:hover {
-  background: #0056b3;
-}
-
-.baseball-game-input {
-  background: #111;
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-  border-top: 1px solid #444;
-  margin-top: 1rem;
-}
-
-.baseball-game-input input {
-  flex: 1;
-  padding: 1rem;
-  border-radius: 10px;
-  border: 2px solid #555;
-  background: #222;
-  color: #fff;
-  font-size: 1.2rem;
-  text-align: center;
-  letter-spacing: 4px;
-}
-
-.baseball-game-input input:disabled {
-  background: #333;
-  color: #666;
-}
-
-.baseball-game-input button {
-  padding: 1rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-  transition: all 0.3s;
-  font-size: 1.1rem;
-}
-
-.baseball-game-input button:nth-child(2) {
-  background: #28a745;
-}
-
-.baseball-game-input button:nth-child(2):hover {
-  background: #1e7e34;
-}
-
-.baseball-game-input button:nth-child(2):disabled {
-  background: #666;
-  cursor: not-allowed;
-}
-
-.baseball-game-input button:nth-child(3) {
-  background: #dc3545;
-}
-
-.baseball-game-input button:nth-child(3):hover {
-  background: #c82333;
-}
-
-/* 게임 종료 모달 */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.overlay.show {
-  display: flex;
-}
-
-.result-modal {
-  background: #222;
-  padding: 2rem;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-  max-width: 400px;
-  width: 90%;
-}
-
-.result-modal h1 {
-  font-size: 1.8rem;
-  color: #2fff5c;
-  margin-bottom: 1rem;
-}
-
-.result-modal p {
-  font-size: 1.2rem;
-  color: #ccc;
-  margin-bottom: 1rem;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-
-.modal-btn {
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s;
-}
-
-.modal-btn.primary {
-  background: #28a745;
-  color: white;
-}
-
-.modal-btn.primary:hover {
-  background: #1e7e34;
-}
-
-.modal-btn.secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.modal-btn.secondary:hover {
-  background: #545b62;
-}
-
-/* ===== 숫자야구 UI 모바일 최적화 ===== */
-@media (max-width: 768px) {
-  .game-info {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .baseball-content {
-    flex-direction: column;
-    overflow-y: auto;
-  }
-
-  .baseball-panel {
-    padding: 1rem;
-  }
-
-  .guess-record, .chat-box {
-    min-height: 200px;
-    max-height: 35vh;
-    flex: 1;
-  }
-
-  .baseball-game-input {
-    flex-wrap: wrap;
-  }
-
-  .baseball-game-input input {
-    min-width: 100%;
-    font-size: 1.1rem;
-    padding: 0.8rem;
-  }
-  
-  .baseball-game-input button {
-    flex-grow: 1;
-  }
-
-  .modal-actions {
-    flex-direction: column;
-  }
-
-  .modal-btn {
-    width: 100%;
-  }
-}
 
 /* ===== 숫자야구 설정 페이지 스타일 ===== */
 .baseball-setup-body {
@@ -1562,14 +1194,14 @@ body.lose-effect {
   flex: 1;
 }
 
-.game-title {
+.game-intro-content .game-title {
   font-size: 2rem;
   font-weight: 700;
   color: #333;
   margin: 0 0 0.5rem 0;
 }
 
-.game-description {
+.game-intro-content .game-description {
   font-size: 1.1rem;
   color: #666;
   margin: 0;
@@ -2028,7 +1660,7 @@ body.lose-effect {
   transform: translateX(-3px);
 }
 
-/* 반응형 디자인 */
+/* 설정 페이지 반응형 */
 @media (max-width: 768px) {
   .setup-header-container {
     padding: 1rem;
@@ -2048,7 +1680,7 @@ body.lose-effect {
     font-size: 3rem;
   }
 
-  .game-title {
+  .game-intro-content .game-title {
     font-size: 1.5rem;
   }
 
@@ -2122,11 +1754,11 @@ body.lose-effect {
     padding: 1rem;
   }
 
-  .game-title {
+  .game-intro-content .game-title {
     font-size: 1.3rem;
   }
 
-  .game-description {
+  .game-intro-content .game-description {
     font-size: 1rem;
   }
 
@@ -2151,251 +1783,257 @@ body.lose-effect {
   }
 }
 
-/* 싱글 플레이어 전용 스타일 */
-.baseball-ui.single-player {
-  /* 기본 레이아웃은 유지하되 싱글 플레이어에 특화된 스타일 적용 */
-}
 
-/* 남은 횟수 표시 스타일 */
-.remaining-attempts {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
+/* ========================================= */
+/* ===== 숫자야구 UI 스타일 (모바일 최적화) ===== */
+/* ========================================= */
 
-.remaining-attempts.warning {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-  box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
-}
-
-.remaining-attempts.danger {
-  background: rgba(220, 53, 69, 0.2);
-  color: #dc3545;
-  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* 싱글 플레이어 모드에서 컨텐츠 영역 조정 */
-.baseball-ui .baseball-content.single-player {
-  display: block; /* 플렉스 대신 블록으로 변경 */
-}
-
-.baseball-ui .baseball-content.single-player .baseball-panel {
+.baseball-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: none;
-  margin-bottom: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  color: #fff;
+  z-index: 200;
 }
 
-/* 추측 기록 영역 확장 */
-.baseball-ui .single-player .guess-record {
-  max-height: 60vh; /* 화면 높이의 60%까지 확장 */
-  min-height: 300px;
-}
-
-/* 시스템 메시지 스타일 개선 */
-.system-chat {
-  background: #444 !important;
-  border-left: 4px solid #007bff;
-  font-weight: 500;
-}
-
-/* 추측 카드 스타일 개선 */
-.guess-card {
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.guess-card:hover {
-  transform: translateX(5px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.guess-card .round {
-  color: #1e90ff;
-  font-size: 0.9rem;
-}
-
-.guess-card .details {
-  font-size: 1rem;
-  margin-top: 0.3rem;
-}
-
-/* 게임 입력 영역 스타일 개선 */
-.baseball-game-input {
+.baseball-ui .baseball-header {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
   background: #111;
-  padding: 1rem;
-  border-top: 2px solid #444;
-}
-
-.baseball-game-input input {
-  font-size: 1.1rem;
-  padding: 0.8rem;
+  border-bottom: 1px solid #444;
   text-align: center;
-  letter-spacing: 2px;
 }
-
-.baseball-game-input button {
-  font-size: 1rem;
-  padding: 0.8rem 1.5rem;
-  font-weight: 600;
+.baseball-ui .baseball-header h1 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
 }
-
-/* 모바일 반응형 스타일 */
-@media (max-width: 768px) {
-  .baseball-header h1 {
-    font-size: 1.3rem;
-  }
-
-  .game-info {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
-
-  .remaining-attempts {
-    font-size: 1rem;
-    padding: 0.7rem 1.2rem;
-  }
-
-  .baseball-main {
-    padding: 0.3rem;
-  }
-
-  .baseball-panel {
-    padding: 0.8rem;
-  }
-
-  .baseball-panel h2 {
-    font-size: 1rem;
-  }
-
-  .guess-record {
-    max-height: 50vh;
-    min-height: 250px;
-  }
-
-  .guess-card {
-    padding: 0.6rem;
-  }
-
-  .guess-card .round {
+.baseball-ui .game-info {
     font-size: 0.8rem;
-  }
-
-  .guess-card .details {
-    font-size: 0.9rem;
-  }
-
-  .chat-box {
-    max-height: 120px;
-  }
-
-  .chat-msg {
-    padding: 0.5rem 0.7rem;
-    font-size: 0.9rem;
-  }
-
-  .baseball-game-input {
-    padding: 0.8rem;
+    color: #ccc;
+    display: flex;
+    justify-content: space-around;
     flex-wrap: wrap;
     gap: 0.5rem;
-  }
-
-  .baseball-game-input input {
-    min-width: 200px;
-    font-size: 1rem;
-  }
-
-  .baseball-game-input button {
-    font-size: 0.9rem;
-    padding: 0.7rem 1.2rem;
-  }
 }
 
-@media (max-width: 480px) {
-  .baseball-header {
-    padding: 0.8rem;
-  }
+.baseball-ui .baseball-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  padding: 0.5rem;
+  padding-bottom: 75px; /* 하단 입력창 높이만큼 공간 확보 */
+}
 
-  .baseball-header h1 {
-    font-size: 1.1rem;
-  }
+.baseball-ui .baseball-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* 모바일 기본: 수직 */
+  gap: 0.5rem;
+  overflow-y: auto; /* 모바일에서는 이 전체 영역이 스크롤됨 */
+}
 
-  .game-info {
-    font-size: 0.8rem;
-  }
+.guess-panels-container,
+.chat-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 0;
+}
 
-  .remaining-attempts {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
+.baseball-ui .baseball-panel {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* 패널 크기 유지 */
+}
 
-  .baseball-panel {
+.baseball-ui .baseball-panel h2 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #555;
+    flex-shrink: 0;
+}
+
+.baseball-ui .guess-record,
+.baseball-ui .chat-box {
+  flex-grow: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  min-height: 100px;
+}
+
+.guess-card {
+  background: #333;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  border-left: 5px solid;
+  transition: background 0.4s, box-shadow 0.4s;
+  margin-bottom: 0.5rem;
+}
+
+.guess-card.success {
+  background: #1fa82c;
+  box-shadow: 0 0 12px #2fff5c;
+  color: #fff;
+  font-weight: bold;
+}
+
+.guess-card.mine { border-color: #1e90ff; }
+.guess-card.theirs { border-color: #ff5252; }
+.guess-card .round { font-weight: bold; margin-bottom: 0.2rem; color: #fff; font-size: 0.9rem; }
+.guess-card .details { font-size: 1.1rem; color: #ccc; }
+
+
+.baseball-ui .chat-input {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.baseball-ui .chat-input input {
+    flex: 1;
     padding: 0.6rem;
-  }
-
-  .guess-record {
-    max-height: 45vh;
-    min-height: 200px;
-  }
-
-  .chat-box {
-    max-height: 100px;
-  }
-
-  .baseball-game-input {
-    flex-direction: column;
-  }
-
-  .baseball-game-input input {
-    width: 100%;
-    min-width: auto;
-  }
-
-  .baseball-game-input button {
-    width: 100%;
-  }
+    border-radius: 8px;
+    border: none;
+    background: #444;
+    color: #fff;
+    font-size: 0.9rem;
+}
+.baseball-ui .chat-input button {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    background: #007bff;
+    font-size: 0.9rem;
 }
 
-/* 게임 종료 모달 모바일 최적화 */
-@media (max-width: 768px) {
-  .result-modal {
-    width: 95%;
-    padding: 1.5rem;
-    margin: 1rem;
-  }
-
-  .result-modal h1 {
-    font-size: 1.5rem;
-  }
-
-  .result-modal p {
-    font-size: 1rem;
-  }
-
-  .modal-actions {
+.chat-box {
+    display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-  }
+    gap: 0.75rem;
+}
 
-  .modal-btn {
-    width: 100%;
+.chat-msg {
+  padding: 0.7rem 1rem;
+  border-radius: 18px;
+  max-width: 80%;
+  line-height: 1.5;
+  word-wrap: break-word;
+  font-size: 1rem;
+}
+
+.mine-chat { background: #007bff; align-self: flex-end; color: #fff; }
+.their-chat { background: #444; align-self: flex-start; color: #fff; }
+.system-chat { align-self: center; background: #666; font-size: 0.9rem; color: #fff; font-style: italic; }
+
+
+/* 하단 고정 입력창 */
+.baseball-ui .baseball-game-input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: #111;
+  padding: 0.75rem;
+  border-top: 1px solid #444;
+  z-index: 201;
+}
+
+.baseball-ui .baseball-game-input input {
+  flex: 1;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #555;
+  background: #222;
+  color: #fff;
+  text-align: center;
+}
+
+.baseball-ui .baseball-game-input button {
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+}
+
+.baseball-ui .baseball-game-input #baseball-guess-button { background: #28a745; }
+.baseball-ui .baseball-game-input #baseball-guess-button:disabled { background: #555; cursor: not-allowed; }
+.baseball-ui .baseball-game-input .btn-danger { background: #dc3545; }
+
+/* 게임 종료 모달 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.overlay.show { display: flex; }
+
+.result-modal {
+  background: #222;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+}
+.result-modal h1 { font-size: 1.8rem; color: #2fff5c; margin-bottom: 1rem; }
+.result-modal p { font-size: 1.2rem; color: #ccc; margin-bottom: 1rem; }
+.modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+.modal-btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s; }
+.modal-btn.primary { background: #28a745; color: white; }
+.modal-btn.primary:hover { background: #1e7e34; }
+.modal-btn.secondary { background: #6c757d; color: white; }
+.modal-btn.secondary:hover { background: #545b62; }
+
+
+/* 데스크톱 화면 레이아웃 (769px 이상) */
+@media (min-width: 769px) {
+  .baseball-ui .baseball-main {
     padding: 1rem;
+    padding-bottom: 90px; /* 데스크탑 입력창 높이 */
+  }
+  .baseball-ui .baseball-content {
+    flex-direction: row; /* 데스크탑: 수평 */
+    overflow-y: hidden; /* 데스크탑에서는 전체 스크롤 없음 */
+    gap: 1rem;
+  }
+  .guess-panels-container {
+      flex: 2;
+      min-width: 0;
+  }
+  .chat-panel-container {
+      flex: 1;
+      min-width: 0;
+  }
+  .baseball-ui .baseball-panel {
+      flex: 1;
+      min-height: 0;
   }
 }
 

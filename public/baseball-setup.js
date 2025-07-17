@@ -52,6 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const baseballAnswerDisplay = document.getElementById("baseball-answer-display");
   const baseballPlayAgain = document.getElementById("baseball-play-again");
 
+  // 항복 확인 모달 요소
+  const surrenderConfirmModal = document.getElementById("surrender-confirm-modal");
+  const confirmSurrenderBtn = document.getElementById("confirm-surrender-btn");
+  const cancelSurrenderBtn = document.getElementById("cancel-surrender-btn");
+
+
   // --- 상태 변수 ---
   let selectedDigits = 3;
   let ws = null;
@@ -161,7 +167,26 @@ document.addEventListener("DOMContentLoaded", () => {
     baseballChatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBaseballChat(); });
     baseballGuessButton.addEventListener("click", submitBaseballGuess);
     baseballGuessInput.addEventListener("keypress", (e) => { if (e.key === "Enter" && !baseballGuessButton.disabled) submitBaseballGuess(); });
-    baseballSurrenderButton.addEventListener("click", () => { if (confirm("정말 게임을 포기하시겠습니까?")) ws.send(JSON.stringify({ type: "surrender" })); });
+    
+    // 게임 포기 버튼 클릭 시 확인 모달 표시
+    baseballSurrenderButton.addEventListener("click", () => {
+        surrenderConfirmModal.classList.add("show");
+    });
+
+    // 항복 확인 모달의 "예" 버튼
+    confirmSurrenderBtn.addEventListener("click", () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: "surrender" }));
+        }
+        surrenderConfirmModal.classList.remove("show");
+    });
+
+    // 항복 확인 모달의 "취소" 버튼
+    cancelSurrenderBtn.addEventListener("click", () => {
+        surrenderConfirmModal.classList.remove("show");
+    });
+
+    // 다시하기 버튼
     baseballPlayAgain.addEventListener("click", () => {
       ws.send(JSON.stringify({ type: "play_again" }));
       baseballGameOverModal.classList.remove("show");
@@ -214,6 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
       case "game_ready":
         setNumberScreen.classList.add("hidden");
         baseballGameScreen.classList.remove("hidden");
+        document.body.classList.add("game-active"); // body 스크롤 방지
         initializeGameUI(data);
         break;
 
@@ -279,13 +305,11 @@ document.addEventListener("DOMContentLoaded", () => {
     baseballResultTitle.textContent = data.result === "win" ? "🎉 승리!" : "😢 패배";
     baseballResultMessage.textContent = data.message;
     
-    // 상대방 정답 표시 로직 수정
     const answerContainer = baseballAnswerDisplay.parentElement;
     if (data.opponentSecret) {
         baseballAnswerDisplay.textContent = data.opponentSecret;
-        answerContainer.style.display = ''; // p 태그를 다시 보이게 함
+        answerContainer.style.display = '';
     } else {
-        // 정답 정보가 없는 경우(예: 승리 시) 해당 라인을 숨김
         answerContainer.style.display = 'none';
     }
 
@@ -303,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = baseballChatInput.value.trim();
     if (!message || !ws) return;
     ws.send(JSON.stringify({ type: "chat_message", text: message }));
-    addChatMessage(nickname, message); // 내가 보낸 메시지 바로 표시
+    addChatMessage(nickname, message);
     baseballChatInput.value = "";
   }
 
