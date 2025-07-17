@@ -1,0 +1,657 @@
+/* 기존 style.css 파일에 추가하거나 교체하세요 */
+
+/* ========================================= */
+/* ===== 향상된 스도쿠 게임 스타일 ===== */
+/* ========================================= */
+
+.sudoku-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+  z-index: 200;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.sudoku-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.sudoku-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sudoku-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #667eea;
+}
+
+.sudoku-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.control-btn {
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn:hover {
+  background: rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+.control-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.control-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sudoku-game-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #555;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.timer-warning {
+  animation: pulse-timer 1s infinite;
+}
+
+.mistake-warning {
+  animation: pulse-mistake 1s infinite;
+}
+
+@keyframes pulse-timer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-mistake {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.sudoku-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  min-height: 0;
+}
+
+#sudoku-board-container {
+  position: relative;
+  width: 100%;
+  max-width: min(400px, 90vmin);
+  aspect-ratio: 1;
+}
+
+#sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  gap: 1px;
+  background: #2c3e50;
+  border: 3px solid #2c3e50;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.sudoku-cell {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1rem, 4vmin, 1.4rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  position: relative;
+  border: 1px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 3x3 박스 경계선 */
+.sudoku-cell.border-right-thick {
+  border-right: 2px solid #2c3e50;
+}
+
+.sudoku-cell.border-bottom-thick {
+  border-bottom: 2px solid #2c3e50;
+}
+
+/* 기본 셀 상태 */
+.sudoku-cell.given {
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.sudoku-cell.user-input {
+  color: #3498db;
+  font-weight: 600;
+  background: #ffffff;
+}
+
+/* 오류 상태 (빨간색) */
+.sudoku-cell.error {
+  color: #e74c3c !important;
+  background: #ffebee !important;
+  font-weight: 700;
+}
+
+/* 선택된 셀 */
+.sudoku-cell.selected {
+  background: #3498db !important;
+  color: white !important;
+  box-shadow: inset 0 0 0 3px #2980b9;
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* 하이라이트 효과들 */
+.sudoku-cell.row-col-highlight {
+  background: rgba(52, 152, 219, 0.15) !important;
+}
+
+.sudoku-cell.box-highlight {
+  background: rgba(149, 165, 166, 0.1) !important;
+}
+
+.sudoku-cell.same-number {
+  background: rgba(241, 196, 15, 0.2) !important;
+  box-shadow: inset 0 0 0 1px rgba(241, 196, 15, 0.4);
+}
+
+/* 선택된 셀이 오류 상태일 때 */
+.sudoku-cell.selected.error {
+  background: #e74c3c !important;
+  color: white !important;
+}
+
+/* 애니메이션 효과들 */
+.sudoku-cell.error-shake {
+  animation: error-shake 0.6s ease-in-out;
+}
+
+.sudoku-cell.correct-flash {
+  animation: correct-flash 0.3s ease-in-out;
+}
+
+.sudoku-cell.hint-flash {
+  animation: hint-flash 0.3s ease-in-out;
+}
+
+.sudoku-cell.completion-flash {
+  animation: completion-flash 0.2s ease-in-out;
+}
+
+@keyframes error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes correct-flash {
+  0% {
+    background: #27ae60;
+    transform: scale(1);
+  }
+  50% {
+    background: #2ecc71;
+    transform: scale(1.1);
+  }
+  100% {
+    background: white;
+    transform: scale(1);
+  }
+}
+
+@keyframes hint-flash {
+  0% {
+    background: #f39c12;
+  }
+  50% {
+    background: #e67e22;
+  }
+  100% {
+    background: white;
+  }
+}
+
+@keyframes completion-flash {
+  0% {
+    background: #27ae60;
+  }
+  100% {
+    background: #2ecc71;
+  }
+}
+
+/* 로딩 및 일시정지 오버레이 */
+.loading-spinner-overlay,
+.pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e9ecef;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.pause-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pause-content h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+/* 컨트롤 바 */
+.sudoku-controls-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.sudoku-controls-bar .control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  min-width: 70px;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #555;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sudoku-controls-bar .control-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sudoku-controls-bar .control-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+.btn-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 숫자 패드 */
+.sudoku-footer {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.num-btn {
+  aspect-ratio: 1;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: clamp(1rem, 4vmin, 1.3rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.num-btn:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.num-btn:active,
+.num-btn.btn-pressed {
+  transform: translateY(0) scale(0.9);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.num-btn.erase-btn {
+  background: #fff5f5;
+  border-color: #fed7d7;
+  color: #e53e3e;
+}
+
+.num-btn.erase-btn:hover {
+  background: #fed7d7;
+  border-color: #e53e3e;
+}
+
+/* 액션 버튼들 */
+.sudoku-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sudoku-actions .btn {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.sudoku-actions .btn-primary {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.sudoku-actions .btn-outline {
+  background: white;
+  color: #667eea;
+  border-color: #667eea;
+}
+
+.sudoku-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 결과 모달 */
+.result-stats {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #333;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .sudoku-header {
+    padding: 0.75rem;
+  }
+
+  .sudoku-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .sudoku-game-info {
+    font-size: 0.8rem;
+    justify-content: space-around;
+  }
+
+  .sudoku-main {
+    padding: 0.5rem;
+  }
+
+  .sudoku-controls-bar {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .sudoku-controls-bar .control-btn {
+    min-width: 60px;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .numpad {
+    gap: 0.4rem;
+  }
+
+  .btn-icon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sudoku-header {
+    padding: 0.5rem;
+  }
+
+  .sudoku-game-info {
+    font-size: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .sudoku-controls-bar .control-btn {
+    min-width: 50px;
+    font-size: 0.65rem;
+    padding: 0.4rem;
+  }
+
+  .numpad {
+    gap: 0.3rem;
+  }
+}
+
+/* 가로 모드 최적화 */
+@media (orientation: landscape) and (max-height: 600px) {
+  .sudoku-header {
+    padding: 0.5rem;
+  }
+
+  .sudoku-main {
+    padding: 0.5rem;
+  }
+
+  .sudoku-controls-bar {
+    padding: 0.5rem;
+  }
+
+  .sudoku-footer {
+    padding: 0.5rem;
+  }
+
+  .numpad {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* 다크모드 대응 */
+@media (prefers-color-scheme: dark) {
+  .sudoku-header,
+  .sudoku-controls-bar,
+  .sudoku-footer {
+    background: rgba(30, 30, 30, 0.95);
+    color: #fff;
+  }
+
+  .sudoku-cell {
+    background: #2a2a2a;
+    color: #fff;
+  }
+
+  .sudoku-cell.given {
+    background: #3a3a3a;
+    color: #ccc;
+  }
+
+  .num-btn {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: #444;
+  }
+
+  .control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+  }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  .sudoku-cell,
+  .num-btn,
+  .control-btn {
+    transition: none;
+  }
+
+  .sudoku-cell.error-shake,
+  .sudoku-cell.correct-flash,
+  .sudoku-cell.hint-flash,
+  .sudoku-cell.completion-flash {
+    animation: none;
+  }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sudoku-cell {
+    border-width: 0.5px;
+  }
+
+  .sudoku-cell.border-right-thick {
+    border-right-width: 1px;
+  }
+
+  .sudoku-cell.border-bottom-thick {
+    border-bottom-width: 1px;
+  }
+}
