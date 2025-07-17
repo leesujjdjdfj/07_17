@@ -2381,63 +2381,67 @@ body.game-active {
     box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
 }
 
-/* 사진과 동일한 스도쿠 UI 스타일 */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ========================================= */
+/* ===== 스도쿠 UI 스타일 (수정된 부분) ===== */
+/* ========================================= */
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f5f5f5;
-  overflow: hidden;
-}
-
+/* 전역 body, * 선택자 대신 .sudoku-ui 클래스 내부에 스타일을 적용하여
+  다른 페이지에 영향을 주지 않도록 수정했습니다.
+*/
 .sudoku-ui {
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: white; /* 스도쿠 게임 화면 배경은 흰색으로 설정 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* overflow: hidden; 속성은 body.game-active 클래스가 제어하므로 여기서는 제거합니다. */
 }
 
+/* 스도쿠 UI 내부의 모든 요소에만 box-sizing을 적용합니다. */
+.sudoku-ui * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
 /* ========== 헤더 ========== */
-.sudoku-header {
+.sudoku-ui .sudoku-header {
   background: white;
   padding: 16px 20px;
   border-bottom: 1px solid #e5e5e5;
   flex-shrink: 0;
 }
 
-.sudoku-header-top {
+.sudoku-ui .sudoku-header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.logo-section {
+.sudoku-ui .logo-section {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.red-dot {
+.sudoku-ui .red-dot {
   width: 8px;
   height: 8px;
   background: #ff4444;
   border-radius: 50%;
 }
 
-.sudoku-header h1 {
+.sudoku-ui .sudoku-header h1 {
   font-size: 20px;
   font-weight: 600;
   color: #333;
 }
 
-.new-game-btn {
+.sudoku-ui .new-game-btn {
   background: #6b7ce8;
   color: white;
   border: none;
@@ -2449,17 +2453,17 @@ body {
   transition: background 0.2s;
 }
 
-.new-game-btn:hover {
+.sudoku-ui .new-game-btn:hover {
   background: #5a6bd8;
 }
 
 /* 점수 표시 */
-.score-section {
+.sudoku-ui .score-section {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.main-score {
+.sudoku-ui .main-score {
   font-size: 48px;
   font-weight: 300;
   color: #333;
@@ -2467,37 +2471,37 @@ body {
 }
 
 /* 게임 정보 */
-.game-info {
+.sudoku-ui .game-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.info-item {
+.sudoku-ui .info-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
 }
 
-.info-item:last-child {
+.sudoku-ui .info-item:last-child {
   flex-direction: row;
   gap: 8px;
 }
 
-.info-label {
+.sudoku-ui .info-label {
   font-size: 12px;
   color: #666;
   font-weight: 400;
 }
 
-.info-value {
+.sudoku-ui .info-value {
   font-size: 14px;
   color: #333;
   font-weight: 500;
 }
 
-.pause-btn {
+.sudoku-ui .pause-btn {
   background: none;
   border: none;
   font-size: 16px;
@@ -2507,12 +2511,12 @@ body {
   transition: background 0.2s;
 }
 
-.pause-btn:hover {
+.sudoku-ui .pause-btn:hover {
   background: #f0f0f0;
 }
 
 /* ========== 게임 보드 ========== */
-.sudoku-main {
+.sudoku-ui .sudoku-main {
   flex: 1;
   display: flex;
   align-items: center;
@@ -2521,14 +2525,14 @@ body {
   background: white;
 }
 
-.sudoku-board-container {
+.sudoku-ui .sudoku-board-container {
   position: relative;
   width: 100%;
   max-width: 350px;
   aspect-ratio: 1;
 }
 
-.sudoku-board {
+.sudoku-ui .sudoku-board {
   width: 100%;
   height: 100%;
   display: grid;
@@ -2539,7 +2543,7 @@ body {
   background: #333;
 }
 
-.sudoku-cell {
+.sudoku-ui .sudoku-cell {
   background: white;
   border: 1px solid #ddd;
   display: flex;
@@ -2553,58 +2557,58 @@ body {
   position: relative;
 }
 
-.sudoku-cell:hover {
+.sudoku-ui .sudoku-cell:hover {
   background: #f8f9fa;
 }
 
 /* 주어진 숫자 (검은색) */
-.sudoku-cell.given {
+.sudoku-ui .sudoku-cell.given {
   background: #f8f9fa;
   color: #333;
   font-weight: 600;
 }
 
 /* 사용자 입력 (파란색) */
-.sudoku-cell.user-input {
+.sudoku-ui .sudoku-cell.user-input {
   background: white;
   color: #6b7ce8;
   font-weight: 500;
 }
 
 /* 선택된 셀 */
-.sudoku-cell.selected {
+.sudoku-ui .sudoku-cell.selected {
   background: #c8d4f7 !important;
   color: #333 !important;
 }
 
 /* 하이라이트된 셀들 */
-.sudoku-cell.highlighted {
+.sudoku-ui .sudoku-cell.highlighted {
   background: #e8f0fe !important;
 }
 
 /* 같은 숫자 하이라이트 */
-.sudoku-cell.same-number {
+.sudoku-ui .sudoku-cell.same-number {
   background: #e8f0fe !important;
 }
 
 /* 오류 셀 (빨간색) */
-.sudoku-cell.error {
+.sudoku-ui .sudoku-cell.error {
   background: #ffebee !important;
   color: #d32f2f !important;
   animation: shake 0.5s ease-in-out;
 }
 
 /* 3x3 박스 구분선 */
-.sudoku-cell.border-right-thick {
+.sudoku-ui .sudoku-cell.border-right-thick {
   border-right: 3px solid #333;
 }
 
-.sudoku-cell.border-bottom-thick {
+.sudoku-ui .sudoku-cell.border-bottom-thick {
   border-bottom: 3px solid #333;
 }
 
 /* ========== 컨트롤 버튼들 ========== */
-.control-buttons {
+.sudoku-ui .control-buttons {
   display: flex;
   justify-content: center;
   gap: 40px;
@@ -2613,7 +2617,7 @@ body {
   border-top: 1px solid #e5e5e5;
 }
 
-.control-btn {
+.sudoku-ui .control-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -2623,16 +2627,16 @@ body {
   transition: background 0.2s;
 }
 
-.control-btn:hover {
+.sudoku-ui .control-btn:hover {
   background: #f0f0f0;
 }
 
-.btn-icon {
+.sudoku-ui .btn-icon {
   font-size: 24px;
   color: #666;
 }
 
-.btn-badge {
+.sudoku-ui .btn-badge {
   position: absolute;
   top: -4px;
   right: -4px;
@@ -2646,18 +2650,18 @@ body {
   text-align: center;
 }
 
-.btn-badge.off {
+.sudoku-ui .btn-badge.off {
   background: #999;
 }
 
 /* ========== 숫자 패드 ========== */
-.number-pad {
+.sudoku-ui .number-pad {
   background: white;
   padding: 20px;
   border-top: 1px solid #e5e5e5;
 }
 
-.numbers-grid {
+.sudoku-ui .numbers-grid {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 12px;
@@ -2665,7 +2669,7 @@ body {
   margin: 0 auto;
 }
 
-.number-btn {
+.sudoku-ui .number-btn {
   aspect-ratio: 1;
   background: none;
   border: none;
@@ -2680,18 +2684,18 @@ body {
   justify-content: center;
 }
 
-.number-btn:hover {
+.sudoku-ui .number-btn:hover {
   background: #f0f4ff;
   transform: scale(1.05);
 }
 
-.number-btn:active {
+.sudoku-ui .number-btn:active {
   transform: scale(0.95);
 }
 
 /* ========== 오버레이들 ========== */
-.loading-overlay,
-.pause-overlay {
+.sudoku-ui .loading-overlay,
+.sudoku-ui .pause-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -2705,7 +2709,7 @@ body {
   z-index: 10;
 }
 
-.spinner {
+.sudoku-ui .spinner {
   width: 40px;
   height: 40px;
   border: 4px solid #e5e5e5;
@@ -2715,7 +2719,7 @@ body {
   margin-bottom: 16px;
 }
 
-.pause-content {
+.sudoku-ui .pause-content {
   text-align: center;
   background: white;
   padding: 32px;
@@ -2723,12 +2727,12 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.pause-content h2 {
+.sudoku-ui .pause-content h2 {
   margin-bottom: 16px;
   color: #333;
 }
 
-.resume-btn {
+.sudoku-ui .resume-btn {
   background: #6b7ce8;
   color: white;
   border: none;
@@ -2739,7 +2743,7 @@ body {
 }
 
 /* ========== 게임 모달 ========== */
-.game-modal {
+.sudoku-ui .game-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -2752,7 +2756,7 @@ body {
   z-index: 100;
 }
 
-.modal-content {
+.sudoku-ui .modal-content {
   background: white;
   padding: 32px;
   border-radius: 16px;
@@ -2761,13 +2765,13 @@ body {
   width: 90%;
 }
 
-.modal-buttons {
+.sudoku-ui .modal-buttons {
   display: flex;
   gap: 12px;
   margin-top: 24px;
 }
 
-.modal-btn {
+.sudoku-ui .modal-btn {
   flex: 1;
   padding: 12px;
   border-radius: 8px;
@@ -2777,28 +2781,19 @@ body {
   transition: all 0.2s;
 }
 
-.modal-btn.primary {
+.sudoku-ui .modal-btn.primary {
   background: #6b7ce8;
   color: white;
   border: none;
 }
 
-.modal-btn.secondary {
+.sudoku-ui .modal-btn.secondary {
   background: white;
   color: #6b7ce8;
   border: 2px solid #6b7ce8;
 }
 
 /* ========== 애니메이션 ========== */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes shake {
   0%,
   100% {
@@ -2813,62 +2808,61 @@ body {
 }
 
 /* ========== 유틸리티 ========== */
-.hidden {
+.sudoku-ui .hidden {
   display: none !important;
 }
 
 /* ========== 반응형 ========== */
 @media (max-width: 480px) {
-  .sudoku-header {
+  .sudoku-ui .sudoku-header {
     padding: 12px 16px;
   }
 
-  .main-score {
+  .sudoku-ui .main-score {
     font-size: 40px;
   }
 
-  .sudoku-main {
+  .sudoku-ui .sudoku-main {
     padding: 16px;
   }
 
-  .sudoku-board-container {
+  .sudoku-ui .sudoku-board-container {
     max-width: 320px;
   }
 
-  .sudoku-cell {
+  .sudoku-ui .sudoku-cell {
     font-size: 16px;
   }
 
-  .control-buttons {
+  .sudoku-ui .control-buttons {
     gap: 30px;
     padding: 16px;
   }
 
-  .number-pad {
+  .sudoku-ui .number-pad {
     padding: 16px;
   }
 
-  .numbers-grid {
+  .sudoku-ui .numbers-grid {
     gap: 8px;
     max-width: 320px;
   }
 
-  .number-btn {
+  .sudoku-ui .number-btn {
     font-size: 20px;
   }
 }
 
 @media (max-width: 360px) {
-  .sudoku-board-container {
+  .sudoku-ui .sudoku-board-container {
     max-width: 280px;
   }
 
-  .sudoku-cell {
+  .sudoku-ui .sudoku-cell {
     font-size: 14px;
   }
 
-  .number-btn {
+  .sudoku-ui .number-btn {
     font-size: 18px;
   }
 }
-
