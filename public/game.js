@@ -17,6 +17,111 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "/";
     return;
   }
+  // ===================================================================
+// 스도쿠 싱글 플레이 로직
+// ===================================================================
+function runSudoku() {
+    const sudokuScreen = document.getElementById("sudoku-game-screen");
+    if (!sudokuScreen) return;
+    sudokuScreen.classList.remove("hidden");
+    document.body.classList.add("game-active");
+
+    const boardElement = document.getElementById("sudoku-board");
+    const numpad = document.getElementById("numpad");
+    const difficultyElem = document.getElementById("sudoku-difficulty");
+    const timerElem = document.getElementById("sudoku-timer");
+    const difficulty = new URLSearchParams(window.location.search).get("difficulty") || "easy";
+
+    let board, solution, userBoard;
+    let selectedCell = null;
+    let timerInterval;
+    let time = 0;
+
+    const puzzles = {
+        easy: ["6-2-5-8-1-8--2-4--7---1-9-----4-5-3---1---7-9-2-----8-1---3--9-7--6-1-3-2-4-7"],
+        medium: ["--9748---7_--------2-1-9-----6---7-5-9-3---5-9-6---1-8---2---4----_--5-7-3--"],
+        hard: ["-2-6-8---58---9-7----4----1-3-7--2---6----_----4-8--1-5-2----3--_--5---6-9-1-4-"]
+    };
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        time = 0;
+        timerInterval = setInterval(() => {
+            time++;
+            const minutes = String(Math.floor(time / 60)).padStart(2, '0');
+            const seconds = String(time % 60).padStart(2, '0');
+            timerElem.textContent = `${minutes}:${seconds}`;
+        }, 1000);
+    }
+
+    function generatePuzzle() {
+        const puzzleString = puzzles[difficulty][0].replace(/_/g, "---------");
+        board = [];
+        userBoard = [];
+        for (let i = 0; i < 9; i++) {
+            board.push(puzzleString.substring(i * 9, i * 9 + 9).split('').map(c => c === '-' ? 0 : parseInt(c)));
+            userBoard.push(Array(9).fill(0));
+        }
+    }
+
+    function drawBoard() {
+        boardElement.innerHTML = "";
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                const cell = document.createElement("div");
+                cell.classList.add("sudoku-cell");
+                if (board[r][c] !== 0) {
+                    cell.textContent = board[r][c];
+                    cell.classList.add("given");
+                } else if (userBoard[r][c] !== 0) {
+                    cell.textContent = userBoard[r][c];
+                }
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+                if ((r === 2 || r === 5) && r !== 8) cell.style.borderBottomWidth = "3px";
+                if ((c === 2 || c === 5) && c !== 8) cell.style.borderRightWidth = "3px";
+                cell.addEventListener("click", () => selectCell(cell));
+                boardElement.appendChild(cell);
+            }
+        }
+    }
+
+    function selectCell(cell) {
+        if (cell.classList.contains("given")) return;
+        if (selectedCell) selectedCell.classList.remove("selected");
+        selectedCell = cell;
+        selectedCell.classList.add("selected");
+    }
+
+    numpad.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON" || !selectedCell) return;
+        
+        const row = selectedCell.dataset.row;
+        const col = selectedCell.dataset.col;
+
+        if (e.target.classList.contains('erase-btn')) {
+            selectedCell.textContent = "";
+            userBoard[row][col] = 0;
+        } else {
+            const num = parseInt(e.target.textContent);
+            selectedCell.textContent = num;
+            userBoard[row][col] = num;
+        }
+    });
+
+    function initSudoku() {
+        difficultyElem.textContent = `난이도: ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`;
+        generatePuzzle();
+        drawBoard();
+        startTimer();
+    }
+    
+    document.getElementById('sudoku-reset-btn').addEventListener('click', initSudoku);
+
+    initSudoku();
+}
+
+  
 
   // ===================================================================
   // =================== 싱글 플레이 모드 로직 =================

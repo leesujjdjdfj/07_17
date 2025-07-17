@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스도쿠 설정 - 햄붱이의 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="baseball-setup-body">
+    <header class="setup-header">
+        <div class="setup-header-container">
+            <div class="setup-logo">
+                <a href="/" class="logo-link"><h1>🎮 햄붱이의 게임</h1></a>
+            </div>
+            <div class="setup-user-info">
+                <div class="user-profile-mini">
+                    <div class="user-avatar-mini">👤</div>
+                    <span id="setup-user-nickname">사용자</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="setup-main">
+        <div class="setup-container">
+            <div id="setup-flow-container">
+                <div class="game-intro-section">
+                    <div class="game-intro-header">
+                        <div class="game-icon-large">🧩</div>
+                        <div class="game-intro-content">
+                            <h1 class="game-title">스도쿠 설정</h1>
+                            <p class="game-description">논리와 추론으로 9x9 그리드를 숫자로 채워보세요.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <div class="setting-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">🔥 난이도 설정</h3>
+                            <p class="setting-subtitle">자신의 실력에 맞는 난이도를 선택하세요.</p>
+                        </div>
+                        <div class="digits-options difficulty-options">
+                            <label class="digit-option active" data-difficulty="easy">
+                                <input type="radio" name="difficulty" value="easy" checked>
+                                <div class="digit-card"><div class="difficulty-label">쉬움</div></div>
+                            </label>
+                            <label class="digit-option" data-difficulty="medium">
+                                <input type="radio" name="difficulty" value="medium">
+                                <div class="digit-card"><div class="difficulty-label">보통</div></div>
+                            </label>
+                            <label class="digit-option" data-difficulty="hard">
+                                <input type="radio" name="difficulty" value="hard">
+                                <div class="digit-card"><div class="difficulty-label">어려움</div></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">🎯 게임 모드 선택</h3>
+                            <p class="setting-subtitle">원하는 게임 방식을 선택하세요.</p>
+                        </div>
+                        <div class="mode-options">
+                            <div class="mode-card" id="single-mode-card">
+                                <div class="mode-icon">🤖</div>
+                                <h4 class="mode-title">혼자하기</h4>
+                                <p class="mode-description">클래식 스도쿠 퍼즐을 풀어보세요.</p>
+                                <button class="mode-button" id="single-mode-button">시작하기</button>
+                            </div>
+                            <div class="mode-card" id="multi-mode-card">
+                                <div class="mode-icon">👥</div>
+                                <h4 class="mode-title">같이하기</h4>
+                                <p class="mode-description">친구와 누가 더 빨리 푸는지 대결해보세요.</p>
+                                <button class="mode-button" id="multi-mode-button">방 설정</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="setup-footer">
+                <a href="/" class="back-button"><span>←</span> 홈으로 돌아가기</a>
+            </div>
+        </div>
+    </main>
+    <script src="sudoku-setup.js"></script>
+</body>
+</html>

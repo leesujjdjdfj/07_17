@@ -66,6 +66,31 @@
             </div>
         </div>
     </div>
+     <!-- 스도쿠 인게임 UI (기본 숨김) -->
+    <div id="sudoku-game-screen" class="hidden sudoku-ui">
+        <header class="sudoku-header">
+            <h1>🧩 스도쿠</h1>
+            <div class="sudoku-game-info">
+                <span id="sudoku-difficulty">난이도: 보통</span>
+                <span id="sudoku-timer">00:00</span>
+            </div>
+        </header>
+        <main class="sudoku-main">
+            <div id="sudoku-board"></div>
+        </main>
+        <footer class="sudoku-footer">
+            <div id="numpad" class="numpad">
+                <button>1</button><button>2</button><button>3</button>
+                <button>4</button><button>5</button><button>6</button>
+                <button>7</button><button>8</button><button>9</button>
+                <button class="erase-btn">X</button>
+            </div>
+            <div class="sudoku-actions">
+                <button id="sudoku-reset-btn">다시 시작</button>
+                <a href="/" class="btn btn-outline" style="flex:1;">나가기</a>
+            </div>
+        </footer>
+    </div>
 
     <!-- 항복 확인 모달 (추가됨) -->
     <div class="overlay" id="surrender-confirm-modal">

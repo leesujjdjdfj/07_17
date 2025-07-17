@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>스도쿠 - 햄붱이의 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="game-active-body">
+    <!-- 스도쿠 인게임 UI -->
+    <div id="sudoku-game-screen" class="sudoku-ui">
+        <header class="sudoku-header">
+            <div class="sudoku-header-top">
+                <h1>🧩 스도쿠</h1>
+                <div class="sudoku-controls">
+                    <button id="pause-btn" class="control-btn">⏸️</button>
+                    <button id="settings-btn" class="control-btn">⚙️</button>
+                </div>
+            </div>
+            <div class="sudoku-game-info">
+                <span id="sudoku-difficulty">난이도: 로딩 중...</span>
+                <span id="mistake-counter">실수: 0 / 3</span>
+                <span id="sudoku-timer">20:00</span>
+                <span id="score-display">점수: 0</span>
+            </div>
+        </header>
+
+        <main class="sudoku-main">
+            <div id="sudoku-board-container">
+                <div id="sudoku-board"></div>
+                <!-- 로딩 스피너 -->
+                <div id="loading-spinner" class="loading-spinner-overlay">
+                    <div class="loading-spinner"></div>
+                    <p>퍼즐 생성 중...</p>
+                </div>
+                <!-- 일시정지 오버레이 -->
+                <div id="pause-overlay" class="pause-overlay hidden">
+                    <div class="pause-content">
+                        <h2>⏸️ 일시정지</h2>
+                        <button id="resume-btn" class="btn btn-primary">계속하기</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 컨트롤 버튼들 -->
+        <div class="sudoku-controls-bar">
+            <button id="undo-btn" class="control-btn">
+                <span class="btn-icon">↶</span>
+                <span class="btn-text">실행취소</span>
+            </button>
+            <button id="erase-btn" class="control-btn">
+                <span class="btn-icon">🗑️</span>
+                <span class="btn-text">지우기</span>
+            </button>
+            <button id="hint-btn" class="control-btn">
+                <span class="btn-icon">💡</span>
+                <span class="btn-text">힌트 <span id="hint-count">(3)</span></span>
+            </button>
+        </div>
+
+        <footer class="sudoku-footer">
+            <div id="numpad" class="numpad">
+                <button class="num-btn" data-num="1">1</button>
+                <button class="num-btn" data-num="2">2</button>
+                <button class="num-btn" data-num="3">3</button>
+                <button class="num-btn" data-num="4">4</button>
+                <button class="num-btn" data-num="5">5</button>
+                <button class="num-btn" data-num="6">6</button>
+                <button class="num-btn" data-num="7">7</button>
+                <button class="num-btn" data-num="8">8</button>
+                <button class="num-btn" data-num="9">9</button>
+                <button class="num-btn erase-btn" data-num="0">❌</button>
+            </div>
+            <div class="sudoku-actions">
+                <a href="/sudoku-setup.html" class="btn btn-outline" style="flex:1;">새 게임</a>
+                <a href="/" class="btn btn-primary" style="flex:1;">홈으로</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 게임 오버/성공 모달 -->
+    <div id="sudoku-result-modal" class="modal-overlay hidden">
+        <div class="result-modal">
+            <h1 id="sudoku-result-title"></h1>
+            <p id="sudoku-result-message"></p>
+            <div id="sudoku-result-stats" class="result-stats"></div>
+            <div class="modal-actions">
+                <button id="new-game-btn" class="modal-btn primary">새 게임</button>
+                <a href="/sudoku-setup.html" class="modal-btn secondary">설정</a>
+                <a href="/" class="modal-btn secondary">홈으로</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="sudoku.js"></script>
+</body>
+</html>
