@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 초기화 ---
     function init() {
+        // 버튼을 초기에 비활성화
+        createRoomBtn.disabled = true;
+        joinRoomBtn.disabled = true;
+        roomCodeInput.disabled = true;
+        
         setupEventListeners();
         connectToServer();
     }
@@ -48,12 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 웹소켓 연결 ---
     function connectToServer() {
         const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        // 로컬에서 테스트할 경우, 서버 주소를 올바르게 입력해야 합니다. (예: "ws://localhost:8080")
         ws = new WebSocket(`${wsProtocol}//${window.location.host}`);
 
         ws.onopen = () => {
             console.log("서버에 연결되었습니다.");
-            addChatMessage("서버에 연결되었습니다.", "system");
+            // 연결 성공 시 버튼 활성화
+            createRoomBtn.disabled = false;
+            joinRoomBtn.disabled = false;
+            roomCodeInput.disabled = false;
+            addChatMessage("서버에 연결되었습니다. 방을 만들거나 참가해주세요.", "system");
         };
 
         ws.onmessage = (event) => {
@@ -69,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ws.onclose = () => {
             console.log("서버 연결이 끊어졌습니다.");
             addChatMessage("서버와 연결이 끊겼습니다. 페이지를 새로고침 해주세요.", "system");
-            // 모든 버튼 비활성화
             disableAllButtons();
         };
 
@@ -79,10 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
             disableAllButtons();
         };
     }
-
+    
     function disableAllButtons() {
         createRoomBtn.disabled = true;
         joinRoomBtn.disabled = true;
+        roomCodeInput.disabled = true;
         confirmMoveBtn.disabled = true;
         surrenderBtn.disabled = true;
     }
@@ -110,9 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'error':
                 alert(`오류: ${data.message}`);
-                // 오류 발생 시 버튼 활성화
+                // 오류 발생 시 버튼 상태 초기화
                 createRoomBtn.disabled = false;
                 joinRoomBtn.disabled = false;
+                roomCodeInput.disabled = false;
                 break;
         }
     }
@@ -120,7 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 이벤트 리스너 설정 ---
     function setupEventListeners() {
         createRoomBtn.addEventListener('click', () => {
-            createRoomBtn.disabled = true;
+            // 연결 상태 확인
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
+            createRoomBtn.disabled = true; // 중복 클릭 방지
+            joinRoomBtn.disabled = true;
             ws.send(JSON.stringify({
                 type: 'create_game',
                 gameType: 'omok',
@@ -129,9 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         joinRoomBtn.addEventListener('click', () => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert("서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.");
+                return;
+            }
             const code = roomCodeInput.value.trim().toUpperCase();
             if (code.length === 4) {
                 joinRoomBtn.disabled = true;
+                createRoomBtn.disabled = true;
                 ws.send(JSON.stringify({
                     type: 'join_game',
                     roomCode: code,
@@ -165,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         createRoomBtn.disabled = true;
         joinRoomBtn.parentElement.classList.add('hidden');
         waitingMessage.textContent = '상대방이 참가하기를 기다리는 중...';
-        // 상대방이 들어올 때까지 게임을 시작하지 않고 대기합니다.
     }
 
     function handleGameStart(data) {
@@ -176,8 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         resetGame();
 
-        const opponent = data.players.find(p => p.nickname !== myNickname);
-        
         const p1 = data.players.find(p => p.color === 'black');
         const p2 = data.players.find(p => p.color === 'white');
 
@@ -231,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         selectedCoords = { x, y };
-        movePreviewMarker(x, y, true); // 마커를 진하게 표시
+        movePreviewMarker(x, y, true);
         confirmMoveBtn.disabled = false;
     }
 
@@ -345,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeLeft <= 5) timerDisplay.classList.add('danger');
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                // 서버에서 시간 초과를 처리하므로 클라이언트에서는 별도 처리 안함
             }
         }, 1000);
     }
@@ -368,6 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverModal.classList.remove('hidden');
     }
 
-    // --- 페이지 로드 시 초기화 실행 ---
+    // 페이지 로드 시 초기화 실행
     init();
 });
