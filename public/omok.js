@@ -1,14 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Game state variables
-    let ws;
-    let roomCode;
-    let myColor;
-    let isMyTurn = false;
-    let selectedCoords = null;
-    let timerInterval = null;
-    let boardState = Array(15).fill(null).map(() => Array(15).fill(null));
-
-    // DOM Elements
+    // --- DOM 요소 ---
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
     const createRoomBtn = document.getElementById('create-room-btn');
@@ -22,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const stoneContainer = document.getElementById('stone-container');
     const previewMarker = document.getElementById('preview-marker');
 
+    const player1Name = document.getElementById('player1-name');
+    const player2Name = document.getElementById('player2-name');
+    const player1Card = document.getElementById('player1-card');
+    const player2Card = document.getElementById('player2-card');
+
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     const surrenderBtn = document.getElementById('surrender-btn');
     const timerDisplay = document.getElementById('timer');
@@ -33,14 +29,172 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultMessage = document.getElementById('result-message');
     const playAgainBtn = document.getElementById('play-again-btn');
 
-    // --- WebSocket Connection ---
-    function connectToServer() {
-        console.log('Attempting to connect to the server...');
-        // In a real environment, you would use WebSocket.
-        // For this example, we simulate the server responses.
+    // --- 게임 상태 변수 ---
+    let ws;
+    let roomCode;
+    let myColor;
+    let myNickname = sessionStorage.getItem("playerNickname") || `Guest${Math.floor(Math.random() * 1000)}`;
+    let isMyTurn = false;
+    let selectedCoords = null;
+    let timerInterval = null;
+    let boardState = Array(15).fill(null).map(() => Array(15).fill(null));
+
+    // --- 초기화 ---
+    function init() {
+        setupEventListeners();
+        connectToServer();
     }
 
-    // --- Game Initialization ---
+    // --- 웹소켓 연결 ---
+    function connectToServer() {
+        const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        // 로컬에서 테스트할 경우, 서버 주소를 올바르게 입력해야 합니다. (예: "ws://localhost:8080")
+        ws = new WebSocket(`${wsProtocol}//${window.location.host}`);
+
+        ws.onopen = () => {
+            console.log("서버에 연결되었습니다.");
+            addChatMessage("서버에 연결되었습니다.", "system");
+        };
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log("서버 메시지 수신:", data);
+                handleServerMessage(data);
+            } catch (error) {
+                console.error("메시지 파싱 오류:", error);
+            }
+        };
+
+        ws.onclose = () => {
+            console.log("서버 연결이 끊어졌습니다.");
+            addChatMessage("서버와 연결이 끊겼습니다. 페이지를 새로고침 해주세요.", "system");
+            // 모든 버튼 비활성화
+            disableAllButtons();
+        };
+
+        ws.onerror = (error) => {
+            console.error("웹소켓 오류:", error);
+            addChatMessage("서버 연결에 오류가 발생했습니다.", "system");
+            disableAllButtons();
+        };
+    }
+
+    function disableAllButtons() {
+        createRoomBtn.disabled = true;
+        joinRoomBtn.disabled = true;
+        confirmMoveBtn.disabled = true;
+        surrenderBtn.disabled = true;
+    }
+
+    // --- 서버 메시지 핸들러 ---
+    function handleServerMessage(data) {
+        switch (data.type) {
+            case 'room_created':
+                handleRoomCreated(data.roomCode);
+                break;
+            case 'game_start':
+                handleGameStart(data);
+                break;
+            case 'turn_update':
+                handleTurnUpdate(data);
+                break;
+            case 'board_update':
+                handleBoardUpdate(data);
+                break;
+            case 'game_over':
+                handleGameOver(data);
+                break;
+            case 'chat_message':
+                addChatMessage(`${data.sender}: ${data.message}`, 'opponent');
+                break;
+            case 'error':
+                alert(`오류: ${data.message}`);
+                // 오류 발생 시 버튼 활성화
+                createRoomBtn.disabled = false;
+                joinRoomBtn.disabled = false;
+                break;
+        }
+    }
+
+    // --- 이벤트 리스너 설정 ---
+    function setupEventListeners() {
+        createRoomBtn.addEventListener('click', () => {
+            createRoomBtn.disabled = true;
+            ws.send(JSON.stringify({
+                type: 'create_game',
+                gameType: 'omok',
+                nickname: myNickname
+            }));
+        });
+
+        joinRoomBtn.addEventListener('click', () => {
+            const code = roomCodeInput.value.trim().toUpperCase();
+            if (code.length === 4) {
+                joinRoomBtn.disabled = true;
+                ws.send(JSON.stringify({
+                    type: 'join_game',
+                    roomCode: code,
+                    nickname: myNickname
+                }));
+            } else {
+                alert('올바른 4자리 방 코드를 입력하세요.');
+            }
+        });
+
+        boardArea.addEventListener('mousemove', handleBoardMouseMove);
+        boardArea.addEventListener('mouseleave', () => { previewMarker.style.display = 'none'; });
+        boardArea.addEventListener('click', handleBoardClick);
+        confirmMoveBtn.addEventListener('click', handleConfirmMove);
+        surrenderBtn.addEventListener('click', handleSurrender);
+        chatSendBtn.addEventListener('click', sendChatMessage);
+        chatInputField.addEventListener('keyup', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+        playAgainBtn.addEventListener('click', () => {
+            ws.send(JSON.stringify({ type: 'play_again' }));
+            gameOverModal.classList.add('hidden');
+            addChatMessage('다시하기를 요청했습니다. 상대방의 응답을 기다립니다.', 'system');
+        });
+    }
+
+    // --- UI 및 게임 로직 함수 ---
+
+    function handleRoomCreated(code) {
+        roomCode = code;
+        roomCodeDisplay.textContent = roomCode;
+        roomInfo.classList.remove('hidden');
+        createRoomBtn.disabled = true;
+        joinRoomBtn.parentElement.classList.add('hidden');
+        waitingMessage.textContent = '상대방이 참가하기를 기다리는 중...';
+        // 상대방이 들어올 때까지 게임을 시작하지 않고 대기합니다.
+    }
+
+    function handleGameStart(data) {
+        myColor = data.myColor;
+        
+        setupScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        
+        resetGame();
+
+        const opponent = data.players.find(p => p.nickname !== myNickname);
+        
+        const p1 = data.players.find(p => p.color === 'black');
+        const p2 = data.players.find(p => p.color === 'white');
+
+        player1Name.textContent = p1.nickname === myNickname ? `${p1.nickname} (나)` : p1.nickname;
+        player2Name.textContent = p2.nickname === myNickname ? `${p2.nickname} (나)` : p2.nickname;
+
+        isMyTurn = data.turn === myColor;
+        updateTurnIndicator();
+        addChatMessage('두 플레이어가 모두 접속했습니다. 게임을 시작합니다!', 'system');
+        if (isMyTurn) {
+            addChatMessage('당신의 턴입니다.', 'system');
+            startTimer(data.timeLimit);
+        } else {
+            addChatMessage('상대방의 턴입니다.', 'system');
+        }
+    }
+
     function resetGame() {
         boardState = Array(15).fill(null).map(() => Array(15).fill(null));
         stoneContainer.innerHTML = '';
@@ -49,35 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
         surrenderBtn.disabled = false;
         previewMarker.style.display = 'none';
         gameOverModal.classList.add('hidden');
+        chatMessages.innerHTML = '';
     }
 
-    // --- Event Handlers ---
-    createRoomBtn.addEventListener('click', () => {
-        // In a real app: ws.send(JSON.stringify({ type: 'create_omok_room' }));
-        const fakeRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
-        handleRoomCreated(fakeRoomCode);
-    });
-
-    joinRoomBtn.addEventListener('click', () => {
-        const code = roomCodeInput.value.trim();
-        if (code.length === 4) {
-            // In a real app: ws.send(JSON.stringify({ type: 'join_omok_room', roomCode: code }));
-            console.log(`Attempting to join room ${code}`);
-            addChatMessage(`'${code}' 방에 참가를 시도합니다...`, 'system');
-            // Simulate successful join and game start
-            setTimeout(() => {
-                handleGameStart({
-                    players: [{ nickname: 'Opponent', color: 'black' }, { nickname: 'Me', color: 'white' }],
-                    myColor: 'white',
-                    turn: 'black'
-                });
-            }, 1500);
-        } else {
-            alert('Please enter a valid 4-digit room code.');
-        }
-    });
-    
-    boardArea.addEventListener('mousemove', (e) => {
+    function handleBoardMouseMove(e) {
         if (!isMyTurn) return;
         const { x, y } = getGridCoordinates(e);
         if (x >= 0 && x < 15 && y >= 0 && y < 15 && !boardState[y][x]) {
@@ -85,13 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             previewMarker.style.display = 'none';
         }
-    });
+    }
 
-    boardArea.addEventListener('mouseleave', () => {
-        previewMarker.style.display = 'none';
-    });
-    
-    boardArea.addEventListener('click', (e) => {
+    function handleBoardClick(e) {
         if (!isMyTurn) {
              addChatMessage('상대방의 턴입니다.', 'system');
              return;
@@ -106,65 +231,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         selectedCoords = { x, y };
-        movePreviewMarker(x, y, true); // Make marker solid
+        movePreviewMarker(x, y, true); // 마커를 진하게 표시
         confirmMoveBtn.disabled = false;
-    });
+    }
 
-    confirmMoveBtn.addEventListener('click', () => {
+    function handleConfirmMove() {
         if (!selectedCoords || !isMyTurn) return;
+        
+        ws.send(JSON.stringify({
+            type: 'place_stone',
+            ...selectedCoords
+        }));
 
-        const { x, y } = selectedCoords;
-        placeStone(x, y, myColor);
-
-        if (checkWin(x, y, myColor)) {
-            // ws.send({ type: 'game_over', ... });
-            handleGameOver({ winner: myColor, reason: '오목을 완성했습니다!' });
-            return;
-        }
-
-        // ws.send({ type: 'place_stone', ... });
         isMyTurn = false;
-        updateTurnIndicator();
-        stopTimer();
-        selectedCoords = null;
         confirmMoveBtn.disabled = true;
         previewMarker.style.display = 'none';
+        stopTimer();
+    }
 
-        // Simulate opponent's move for local testing
-        setTimeout(simulateOpponentMove, 1500);
-    });
-
-    surrenderBtn.addEventListener('click', () => {
-        if (confirm('정말로 게임을 포기하시겠습니까?')) {
-            // ws.send(JSON.stringify({ type: 'surrender' }));
-            const winner = myColor === 'black' ? 'white' : 'black';
-            handleGameOver({ winner, reason: '상대방이 기권했습니다.' });
+    function handleBoardUpdate(data) {
+        placeStone(data.x, data.y, data.color);
+    }
+    
+    function handleTurnUpdate(data) {
+        isMyTurn = data.turn === myColor;
+        updateTurnIndicator();
+        stopTimer();
+        if (isMyTurn) {
+            addChatMessage('당신의 턴입니다.', 'system');
+            startTimer(data.timeLimit);
+        } else {
+            addChatMessage('상대방의 턴입니다.', 'system');
         }
-    });
+    }
 
-    chatSendBtn.addEventListener('click', sendChatMessage);
-    chatInputField.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') sendChatMessage();
-    });
+    function handleSurrender() {
+        if (confirm('정말로 게임을 포기하시겠습니까?')) {
+            ws.send(JSON.stringify({ type: 'surrender' }));
+        }
+    }
 
-    playAgainBtn.addEventListener('click', () => {
-        // ws.send(JSON.stringify({ type: 'play_again' }));
-        gameOverModal.classList.add('hidden');
-        addChatMessage('다시하기를 요청했습니다. 상대방을 기다립니다.', 'system');
-        setTimeout(() => handleGameStart({
-             players: [{ nickname: 'Me', color: 'black' }, { nickname: 'Opponent', color: 'white' }],
-             myColor: 'black',
-             turn: 'black'
-        }), 2000);
-    });
-
-    // --- Game Logic Functions ---
     function getGridCoordinates(e) {
         const rect = boardArea.getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
         const offsetY = e.clientY - rect.top;
 
-        const cellSize = rect.width / 14; // 14 spaces between 15 lines
+        const cellSize = rect.width / 14;
         
         const x = Math.round(offsetX / cellSize);
         const y = Math.round(offsetY / cellSize);
@@ -195,37 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
         stoneContainer.appendChild(stone);
     }
 
-    function checkWin(x, y, color) {
-        const directions = [
-            { dx: 1, dy: 0 },  // Horizontal
-            { dx: 0, dy: 1 },  // Vertical
-            { dx: 1, dy: 1 },  // Diagonal \
-            { dx: 1, dy: -1 }  // Diagonal /
-        ];
-
-        for (const { dx, dy } of directions) {
-            let count = 1;
-            for (let i = 1; i < 5; i++) {
-                const nx = x + i * dx;
-                const ny = y + i * dy;
-                if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15 && boardState[ny][nx] === color) count++;
-                else break;
-            }
-            for (let i = 1; i < 5; i++) {
-                const nx = x - i * dx;
-                const ny = y - i * dy;
-                if (nx >= 0 && nx < 15 && ny >= 0 && ny < 15 && boardState[ny][nx] === color) count++;
-                else break;
-            }
-            if (count >= 5) return true;
-        }
-        return false;
-    }
-
-    // --- UI and Messaging Functions ---
     function sendChatMessage() {
         const message = chatInputField.value.trim();
-        if (message) {
+        if (message && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'chat_message',
+                message: message
+            }));
             addChatMessage(`나: ${message}`, 'mine');
             chatInputField.value = '';
         }
@@ -240,16 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTurnIndicator() {
-        const p1Card = document.getElementById('player1-card');
-        const p2Card = document.getElementById('player2-card');
         const turnPlayerColor = isMyTurn ? myColor : (myColor === 'black' ? 'white' : 'black');
-        p1Card.classList.toggle('active', turnPlayerColor === 'black');
-        p2Card.classList.toggle('active', turnPlayerColor === 'white');
+        player1Card.classList.toggle('active', turnPlayerColor === 'black');
+        player2Card.classList.toggle('active', turnPlayerColor === 'white');
     }
 
-    // --- Timer Functions ---
-    function startTimer() {
-        let timeLeft = 30;
+    function startTimer(timeLimit = 30) {
+        let timeLeft = timeLimit;
         timerDisplay.textContent = timeLeft;
         timerDisplay.className = '';
         clearInterval(timerInterval);
@@ -260,63 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeLeft <= 5) timerDisplay.classList.add('danger');
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                handleGameOver({ winner: myColor === 'black' ? 'white' : 'black', reason: '시간 초과' });
+                // 서버에서 시간 초과를 처리하므로 클라이언트에서는 별도 처리 안함
             }
         }, 1000);
     }
 
     function stopTimer() {
         clearInterval(timerInterval);
-    }
-
-    // --- Server Message Handlers (Simulated) ---
-    function handleRoomCreated(code) {
-        roomCode = code;
-        roomCodeDisplay.textContent = roomCode;
-        roomInfo.classList.remove('hidden');
-        createRoomBtn.disabled = true;
-        joinRoomBtn.parentElement.classList.add('hidden');
-        waitingMessage.textContent = '상대방이 참가하기를 기다리는 중...';
-        
-        // Simulate opponent joining after a delay
-        setTimeout(() => {
-            if (gameScreen.classList.contains('hidden')) { // Only start if game hasn't started
-                 handleGameStart({
-                    players: [{ nickname: 'Me', color: 'black' }, { nickname: 'Opponent', color: 'white' }],
-                    myColor: 'black',
-                    turn: 'black'
-                });
-            }
-        }, 3000);
-    }
-
-    function handleGameStart(data) {
-        myColor = data.myColor;
-        isMyTurn = data.turn === myColor;
-
-        setupScreen.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
-        
-        resetGame();
-
-        const myInfo = data.players.find(p => p.color === myColor);
-        const opponentInfo = data.players.find(p => p.color !== myColor);
-        
-        const p1Name = document.getElementById('player1-name');
-        const p2Name = document.getElementById('player2-name');
-
-        if (myColor === 'black') {
-            p1Name.textContent = `${myInfo.nickname} (나)`;
-            p2Name.textContent = opponentInfo.nickname;
-        } else {
-            p1Name.textContent = opponentInfo.nickname;
-            p2Name.textContent = `${myInfo.nickname} (나)`;
-        }
-        
-        updateTurnIndicator();
-        addChatMessage('두 플레이어가 모두 접속했습니다. 게임을 시작합니다!', 'system');
-        addChatMessage(isMyTurn ? '당신의 턴입니다.' : '상대방의 턴입니다.', 'system');
-        if (isMyTurn) startTimer();
     }
 
     function handleGameOver({ winner, reason }) {
@@ -326,41 +361,13 @@ document.addEventListener('DOMContentLoaded', () => {
         surrenderBtn.disabled = true;
         previewMarker.style.display = 'none';
 
-        const isWin = winner === myColor;
+        const isWin = winner === myNickname;
         resultTitle.textContent = isWin ? '🎉 승리! 🎉' : '😢 패배 😢';
         resultTitle.className = isWin ? 'win' : 'lose';
         resultMessage.textContent = reason;
         gameOverModal.classList.remove('hidden');
     }
 
-    // --- Utility for Local Test ---
-    function simulateOpponentMove() {
-        const opponentColor = myColor === 'black' ? 'white' : 'black';
-        const opponentMove = findRandomEmptyCell();
-        if (opponentMove) {
-            placeStone(opponentMove.x, opponentMove.y, opponentColor);
-            if (checkWin(opponentMove.x, opponentMove.y, opponentColor)) {
-                handleGameOver({ winner: opponentColor, reason: '상대방이 오목을 완성했습니다.' });
-            } else {
-                isMyTurn = true;
-                updateTurnIndicator();
-                startTimer();
-                addChatMessage('당신의 턴입니다.', 'system');
-            }
-        }
-    }
-
-    function findRandomEmptyCell() {
-        const emptyCells = [];
-        for (let y = 0; y < 15; y++) {
-            for (let x = 0; x < 15; x++) {
-                if (!boardState[y][x]) {
-                    emptyCells.push({ x, y });
-                }
-            }
-        }
-        return emptyCells.length > 0 ? emptyCells[Math.floor(Math.random() * emptyCells.length)] : null;
-    }
-
-    connectToServer();
+    // --- 페이지 로드 시 초기화 실행 ---
+    init();
 });
