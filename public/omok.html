@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오목 멀티플레이</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="omok-body">
+
+    <div class="game-container">
+        <!-- 방 설정 화면 -->
+        <div id="setup-screen" class="setup-screen">
+            <h1>🕹️ 오목 멀티플레이</h1>
+            <p>방을 만들거나 친구의 방에 참가하여 게임을 시작하세요.</p>
+            <div class="room-actions">
+                <button id="create-room-btn" class="btn">방 만들기</button>
+                <div class="join-form">
+                    <input type="text" id="room-code-input" placeholder="방 코드 입력" maxlength="4">
+                    <button id="join-room-btn" class="btn">참가하기</button>
+                </div>
+            </div>
+            <div id="room-info" class="hidden">
+                <p>방이 생성되었습니다! 아래 코드를 친구에게 공유하세요.</p>
+                <strong id="room-code-display"></strong>
+                <p id="waiting-message" style="margin-top: 1rem;">상대방이 참가하기를 기다리는 중...</p>
+            </div>
+        </div>
+
+        <!-- 게임 플레이 화면 -->
+        <div id="game-screen" class="game-screen hidden">
+            <div id="board-area" class="board-area">
+                <!-- 돌을 놓을 위치를 표시하는 마커 -->
+                <div id="preview-marker"></div>
+                <!-- 실제 돌들이 추가될 컨테이너 -->
+                <div id="stone-container"></div>
+            </div>
+            <div class="side-panel">
+                <div class="player-info">
+                    <h3>플레이어</h3>
+                    <div id="player1-card" class="player-card">
+                        <span class="player-name"><span class="player-stone black"></span><span id="player1-name">플레이어 1</span></span>
+                        <span id="player1-score">0</span>
+                    </div>
+                    <div id="player2-card" class="player-card">
+                        <span class="player-name"><span class="player-stone white"></span><span id="player2-name">플레이어 2</span></span>
+                        <span id="player2-score">0</span>
+                    </div>
+                </div>
+                <div class="timer-info">
+                    <h3>남은 시간</h3>
+                    <div id="timer">30</div>
+                </div>
+                <div class="actions">
+                    <h3>액션</h3>
+                    <button id="confirm-move-btn" class="btn" disabled>여기에 착수</button>
+                    <button id="surrender-btn" class="btn btn-danger">게임 포기</button>
+                </div>
+                <div class="chat-panel">
+                    <h3>채팅</h3>
+                    <div id="chat-messages"></div>
+                    <div id="chat-input">
+                        <input type="text" id="chat-input-field" placeholder="메시지 입력...">
+                        <button id="chat-send-btn" class="btn">전송</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 종료 모달 -->
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="result-title"></h2>
+            <p id="result-message"></p>
+            <div class="modal-actions">
+                <button id="play-again-btn" class="btn">다시하기</button>
+                <a href="/" class="btn">홈으로</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="omok.js"></script>
+</body>
+</html>
